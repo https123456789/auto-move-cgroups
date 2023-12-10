@@ -12,6 +12,8 @@
 static volatile char need_exit = 0;
 
 static void termination_handler(int sigcode) {
+    printf("\n"); // Print a newline so the output looks nicer
+    printf("Recived termination request.\n");
     need_exit = 1;
 }
 
