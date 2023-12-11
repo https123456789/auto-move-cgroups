@@ -78,6 +78,11 @@ int nl_connect(int nl_sock) {
 }
 
 // Subscribe to process events so we can be notified when a new process is spawned
+//
+// The proc connector is a bit messy to work with; you have to send a message inside of a message
+// inside of yet another message. The internet doesn't have a whole lot about the conenctor but I
+// did manage to find a nice article (taken from the Wayback machine) that discusses it.
+// https://nick-black.com/dankwiki/index.php/The_Proc_Connector_and_Socket_Filters
 int set_proc_events_listening(int nl_sock, char enable) {
     // Define the message structure we need to send the subscription request
     struct __attribute__ ((aligned(NLMSG_ALIGNTO))) {
@@ -135,7 +140,36 @@ int handle_process_events(int nl_sock) {
             return -1;
         }
 
-        printf("Got message\n");
+        // Why are the TGID and PID flipped?
+        //
+        // The kernel views PIDs a bit different than programs in the userspace.
+        // In the kernel, TGIDs are equivalent to PIDs in userspace and vice-versa.
+        // Thus, we need to re-interpret the TGID and PID fields we recieve.
+        switch (msg.proc_ev.what) {
+            case PROC_EVENT_NONE:
+                printf("Process event stream is open.\n");
+                break;
+            case PROC_EVENT_FORK:
+                printf(
+                    "fork: ptid=%d,ppid=%d -> tid=%d,pid=%d\n",
+                    msg.proc_ev.event_data.fork.parent_tgid,
+                    msg.proc_ev.event_data.fork.parent_pid,
+                    msg.proc_ev.event_data.fork.child_tgid,
+                    msg.proc_ev.event_data.fork.child_pid
+                );
+                break;
+            case PROC_EVENT_EXEC:
+                printf(
+                    "exec: tid=%d,pid=%d\n",
+                    msg.proc_ev.event_data.exec.process_tgid,
+                    msg.proc_ev.event_data.exec.process_pid
+                );
+                break;
+            // We only care about when new processes are spawned, so we only handle exec and fork
+            // events.
+            default:
+                break;
+        }
     }
 
     return 0;
