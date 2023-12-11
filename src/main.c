@@ -140,29 +140,47 @@ int handle_process_events(int nl_sock) {
             return -1;
         }
 
-        // Why are the TGID and PID flipped?
-        //
         // The kernel views PIDs a bit different than programs in the userspace.
         // In the kernel, TGIDs are equivalent to PIDs in userspace and vice-versa.
         // Thus, we need to re-interpret the TGID and PID fields we recieve.
+        //
+        // A good explantation
+        // https://stackoverflow.com/a/9306150/15566643
         switch (msg.proc_ev.what) {
             case PROC_EVENT_NONE:
                 printf("Process event stream is open.\n");
                 break;
             case PROC_EVENT_FORK:
-                printf(
-                    "fork: ptid=%d,ppid=%d -> tid=%d,pid=%d\n",
+                /*printf(
+                    "fork: ppid=%d,ptid=%d -> pid=%d,tid=%d\n",
                     msg.proc_ev.event_data.fork.parent_tgid,
                     msg.proc_ev.event_data.fork.parent_pid,
                     msg.proc_ev.event_data.fork.child_tgid,
                     msg.proc_ev.event_data.fork.child_pid
-                );
+                );*/
                 break;
             case PROC_EVENT_EXEC:
+                char exe_path[4096];
+                char exe_true_path[4096];
+
+                bzero(exe_true_path, 4096); // readlink does set a null terminator
+
+                snprintf(
+                    exe_path,
+                    4096,
+                    "/proc/%d/exe",
+                    msg.proc_ev.event_data.exec.process_tgid
+                );
+
+                if (readlink(exe_path, exe_true_path, 4096) < 0) {
+                    perror("PROC_EVENT_EXEC: readlink");
+                }
+
                 printf(
-                    "exec: tid=%d,pid=%d\n",
+                    "exec: pid=%d,tid=%d\n\texe: %s\n",
                     msg.proc_ev.event_data.exec.process_tgid,
-                    msg.proc_ev.event_data.exec.process_pid
+                    msg.proc_ev.event_data.exec.process_pid,
+                    exe_true_path
                 );
                 break;
             // We only care about when new processes are spawned, so we only handle exec and fork

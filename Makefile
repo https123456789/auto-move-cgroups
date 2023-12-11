@@ -5,7 +5,8 @@ OFILES_PREFIXED := $(addprefix $(BUILD_DIR)/src/,$(SRC:.c=.o))
 CFLAGS := -Wall -Werror
 
 all: $(BUILD_DIR)/auto-move-cgroups
-	chmod u+s $<
+	sudo chown root $<
+	sudo chmod u+s $<
 
 .PHONY: run
 run: all
