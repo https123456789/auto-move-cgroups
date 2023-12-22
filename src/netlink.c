@@ -127,7 +127,7 @@ int handle_process_events(int nl_sock) {
                 char exe_path[4096];
                 char exe_true_path[4096];
 
-                bzero(exe_true_path, 4096); // readlink does set a null terminator
+                bzero(exe_true_path, 4096); // readlink doesn't set a null terminator
 
                 snprintf(
                     exe_path,
