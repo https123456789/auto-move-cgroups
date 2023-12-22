@@ -1,8 +1,8 @@
 BUILD_DIR ?= build
-SRC := main.c
+SRC := main.c config.c netlink.c signals.c cgroup.c
 OFILES := $(SRC:.c=.o)
 OFILES_PREFIXED := $(addprefix $(BUILD_DIR)/src/,$(SRC:.c=.o))
-CFLAGS := -Wall -Werror
+CFLAGS := -Wall -Werror -lcgroup
 
 all: $(BUILD_DIR)/auto-move-cgroups
 	sudo chown root $<
