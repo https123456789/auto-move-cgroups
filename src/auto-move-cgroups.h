@@ -1,10 +1,12 @@
 #ifndef _AUTO_MOVE_CGROUPS_H_
 #define _AUTO_MOVE_CGROUPS_H_
 
+#include "config.h"
+
 extern volatile char need_exit;
 
-
-void init_libcgroup(void);
+struct config init_libcgroup(void);
+void deinit_libcgroup(struct config c);
 
 // Signal management
 void termination_handler(int sigcode);

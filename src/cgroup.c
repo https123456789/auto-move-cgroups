@@ -4,7 +4,7 @@
 #include "auto-move-cgroups.h"
 #include "config.h"
 
-void init_libcgroup(void) {
+struct config init_libcgroup(void) {
     int ret;
 
     if ((ret = cgroup_init())) {
@@ -12,11 +12,44 @@ void init_libcgroup(void) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Initialized cgroups\n");
-
     struct config c = generate_config();
 
     printf("Config specifies %ld groups.\n", c.group_count);
 
-    exit(0);
+    struct config_group_def *gd = c.groups;
+
+    while (gd != NULL) {
+        printf("\tGroup: %s -> %s\n", gd->name, gd->target);
+
+        // Initialize the cgroup
+        gd->cgroup = cgroup_new_cgroup(gd->name);
+        gd->cpu_controller = cgroup_add_controller(gd->cgroup, "cpu");
+
+        // Actually create the cgroup in the kernel
+        cgroup_create_cgroup(gd->cgroup, 0);
+
+        gd = gd->next;
+    }
+
+    printf("Initialized cgroups\n");
+
+    return c;
+}
+
+void deinit_libcgroup(struct config c) {
+    printf("Beginning deinit of cgroups\n");
+
+    struct config_group_def *gd = c.groups;
+
+    while (gd != NULL) {
+        printf("\tDeinit group: %s\n", gd->name);
+
+        cgroup_delete_cgroup(gd->cgroup, 0);
+        cgroup_free_controllers(gd->cgroup);
+        cgroup_free(&gd->cgroup);
+
+        gd = gd->next;
+    }
+
+    printf("Deinitialized cgroups\n");
 }

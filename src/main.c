@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "auto-move-cgroups.h"
@@ -14,7 +15,7 @@ int main() {
 
     setup_interrupts();
 
-    init_libcgroup();
+    struct config config = init_libcgroup();
 
     nl_sock = nl_socket();
 
@@ -51,6 +52,7 @@ int main() {
 wrapup:
     printf("Exiting...\n");
     close(nl_sock);
+    deinit_libcgroup(config);
 
     return exit_status;
 }
