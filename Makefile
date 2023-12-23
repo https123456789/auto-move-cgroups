@@ -4,13 +4,21 @@ OFILES := $(SRC:.c=.o)
 OFILES_PREFIXED := $(addprefix $(BUILD_DIR)/src/,$(SRC:.c=.o))
 CFLAGS := -Wall -Werror -lcgroup
 
+ifeq ($(PREFIX),)
+    PREFIX := /usr/bin
+endif
+
 all: $(BUILD_DIR)/auto-move-cgroups
-	sudo chown root $<
-	sudo chmod u+s $<
+	chown root $<
+	chmod u+s $<
 
 .PHONY: run
 run: all
 	./$(BUILD_DIR)/auto-move-cgroups
+
+.PHONY: install
+install: all
+	install -m 4755 -o root -g root $(BUILD_DIR)/auto-move-cgroups $(PREFIX)/auto-move-cgroups
 
 $(BUILD_DIR)/auto-move-cgroups: $(OFILES_PREFIXED)
 	gcc -o $@ $(CFLAGS) $^
