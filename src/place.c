@@ -1,5 +1,6 @@
 #include <asm-generic/errno-base.h>
 #include <errno.h>
+#include <regex.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -47,8 +48,14 @@ int place_process(int pid, int tid, struct config *config) {
     struct config_group_def *gd = config->groups;
 
     while (gd != NULL) {
-        if (strcmp(exe_true_path, gd->target) == 0) {
+        int cmp_res = regexec(&gd->target_exp, exe_true_path, 0, NULL, 0);
+
+        if (!cmp_res) {
             break;
+        } else if (cmp_res != REG_NOMATCH) {
+            char msgbuf[100];
+            regerror(cmp_res, &gd->target_exp, msgbuf, sizeof(msgbuf));
+            fprintf(stderr, "Regex match gave error: %s\n", msgbuf);
         }
 
         gd = gd->next;

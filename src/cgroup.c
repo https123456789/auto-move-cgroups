@@ -50,6 +50,8 @@ void deinit_libcgroup(struct config c) {
         cgroup_free_controllers(gd->cgroup);
         cgroup_free(&gd->cgroup);
 
+        regfree(&gd->target_exp);
+
         gd = gd->next;
     }
 

@@ -10,11 +10,13 @@
 #define _AUTO_MOVE_CGROUPS_CONFIG_H_
 
 #include <libcgroup.h>
+#include <regex.h>
 #include <stdint.h>
 
 struct config_group_def {
     const char *name;
     const char *target;
+    regex_t target_exp;
     struct config_group_def *next;
     struct cgroup *cgroup;
     struct cgroup_controller *cpu_controller;
