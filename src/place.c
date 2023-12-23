@@ -66,8 +66,6 @@ int place_process(int pid, int tid, struct config *config) {
         exe_true_path
     );
 
-    printf("\n\n%s\n\n", exe_true_path);
-
     cgroup_attach_task_pid(gd->cgroup, pid);
 
     return 0;
