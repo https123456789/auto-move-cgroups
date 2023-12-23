@@ -13,3 +13,7 @@ You need to have [libcgroup](https://github.com/libcgroup/libcgroup) installed o
 ## Build instructions
 
 You can build the project via `make` and install the binary via `make install`.
+
+## Important Details
+
+As of now, this program will attempt to re-assign the cgroup for any process that matches. This may cause problems for Docker containers and the like.

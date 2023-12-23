@@ -1,10 +1,14 @@
 #include <libcgroup.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include "auto-move-cgroups.h"
 #include "config.h"
 
 struct config init_libcgroup(void) {
+    printf("Beginning init of cgroups\n");
+
     int ret;
 
     if ((ret = cgroup_init())) {
@@ -13,8 +17,6 @@ struct config init_libcgroup(void) {
     }
 
     struct config c = generate_config();
-
-    printf("Config specifies %ld groups.\n", c.group_count);
 
     struct config_group_def *gd = c.groups;
 

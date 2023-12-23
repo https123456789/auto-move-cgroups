@@ -37,7 +37,7 @@ int main() {
 
     printf("Listening for events...\n");
 
-    if (handle_process_events(nl_sock) == -1) {
+    if (handle_process_events(nl_sock, &config) == -1) {
         exit_status = EXIT_FAILURE;
         goto wrapup;
     }

@@ -22,7 +22,6 @@ struct config_group_def {
 
 struct config {
     struct config_group_def *groups;
-    size_t group_count;
 };
 
 struct config generate_config(void);

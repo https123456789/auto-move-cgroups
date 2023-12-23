@@ -3,7 +3,6 @@
 #include <linux/connector.h>
 #include <linux/netlink.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -80,7 +79,7 @@ int set_proc_events_listening(int nl_sock, char enable) {
     return 0;
 }
 
-int handle_process_events(int nl_sock) {
+int handle_process_events(int nl_sock, struct config *config) {
     struct __attribute__ ((aligned(NLMSG_ALIGNTO))) {
         struct nlmsghdr nl_hdr; // Every netlink message has to start with a header
         struct __attribute__ ((__packed__)) {
@@ -124,27 +123,10 @@ int handle_process_events(int nl_sock) {
                 );*/
                 break;
             case PROC_EVENT_EXEC:
-                char exe_path[4096];
-                char exe_true_path[4096];
-
-                bzero(exe_true_path, 4096); // readlink doesn't set a null terminator
-
-                snprintf(
-                    exe_path,
-                    4096,
-                    "/proc/%d/exe",
-                    msg.proc_ev.event_data.exec.process_tgid
-                );
-
-                if (readlink(exe_path, exe_true_path, 4096) < 0) {
-                    perror("PROC_EVENT_EXEC: readlink");
-                }
-
-                printf(
-                    "exec: pid=%d,tid=%d\n\texe: %s\n",
+                place_process(
                     msg.proc_ev.event_data.exec.process_tgid,
                     msg.proc_ev.event_data.exec.process_pid,
-                    exe_true_path
+                    config
                 );
                 break;
             // We only care about when new processes are spawned, so we only handle exec and fork

@@ -1,5 +1,5 @@
 BUILD_DIR ?= build
-SRC := main.c config.c netlink.c signals.c cgroup.c
+SRC := main.c config.c netlink.c signals.c cgroup.c place.c
 OFILES := $(SRC:.c=.o)
 OFILES_PREFIXED := $(addprefix $(BUILD_DIR)/src/,$(SRC:.c=.o))
 CFLAGS := -Wall -Werror -lcgroup
