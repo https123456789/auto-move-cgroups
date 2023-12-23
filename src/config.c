@@ -6,7 +6,7 @@ struct config generate_config(void) {
     struct config_group_def *browser = malloc(sizeof(struct config_group_def));
 
     // Setup the browser group to select processes who's name matches 'firefox-developer-edition'
-    browser->name = "browsers";
+    browser->name = "browser";
     browser->target = "/usr/lib/firefox-developer-edition/firefox";
     browser->next = NULL;
 

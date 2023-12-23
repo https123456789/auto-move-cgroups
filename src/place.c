@@ -1,3 +1,4 @@
+#include <asm-generic/errno-base.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,12 +25,19 @@ int place_process(int pid, int tid, struct config *config) {
         exe_filterable = 0;
     }
 
+    // If the error was ENOENT, then the process was so short lived and thus there is no need to
+    // continue doing any work inside of this function
+    if (errno == ENOENT) {
+        return -3;
+    }
+
     if (!exe_filterable) {
         fprintf(
             stderr,
-            "Can't place process (pid: %d, tid: %d) because readlink failed\n",
+            "Can't place process (pid: %d, tid: %d) because readlink failed: %s\n",
             pid,
-            tid
+            tid,
+            strerror(errno)
         );
         return -1;
     }
@@ -52,7 +60,7 @@ int place_process(int pid, int tid, struct config *config) {
     }
 
     printf(
-        "exec: pid=%d,tid=%d\n\texe: %s\n",
+        "proc: pid=%d,tid=%d\n\texe: %s\n",
         pid,
         tid,
         exe_true_path

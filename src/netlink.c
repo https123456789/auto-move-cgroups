@@ -114,13 +114,11 @@ int handle_process_events(int nl_sock, struct config *config) {
                 printf("Process event stream is open.\n");
                 break;
             case PROC_EVENT_FORK:
-                /*printf(
-                    "fork: ppid=%d,ptid=%d -> pid=%d,tid=%d\n",
-                    msg.proc_ev.event_data.fork.parent_tgid,
-                    msg.proc_ev.event_data.fork.parent_pid,
+                place_process(
                     msg.proc_ev.event_data.fork.child_tgid,
-                    msg.proc_ev.event_data.fork.child_pid
-                );*/
+                    msg.proc_ev.event_data.fork.child_pid,
+                    config
+                );
                 break;
             case PROC_EVENT_EXEC:
                 place_process(
