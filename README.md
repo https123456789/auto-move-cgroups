@@ -17,3 +17,7 @@ You can build the project via `make` and install the binary via `make install`.
 ## Important Details
 
 As of now, this program will attempt to re-assign the cgroup for any process that matches. This may cause problems for Docker containers and the like.
+
+## Configuration
+
+The program is configured through `config.c` (found in the `src` directory).
